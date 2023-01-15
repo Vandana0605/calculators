@@ -1,6 +1,6 @@
 # Calculator
 
-In this project, we have created various kind of calculators.
+In this project, It has various kind of calculators.
 
 ## Setup Virtual Environment
 - Install python  
