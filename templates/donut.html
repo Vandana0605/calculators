@@ -1,0 +1,32 @@
+ {% extends 'base.html' %}
+ {% load static %}
+ {% block title %}Donut{% endblock %}
+ {% block content %}
+ <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+
+<script>
+var xValues = ["Italy", "France"];
+var yValues = [55, 49];
+var barColors = [
+  "#5367ff",
+  "#98a4ff"
+
+];
+
+new Chart("myChart", {
+  type: "doughnut",
+  data: {
+    labels: xValues,
+    datasets: [{
+      backgroundColor: barColors,
+      data: yValues
+    }]
+  },
+  options: {
+    title: {
+      display: true,
+    }
+  }
+});
+</script>
+{% endblock %}

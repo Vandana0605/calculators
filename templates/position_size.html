@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Dasboard{% endblock %}
+{% block content %}
+<div class="wrapper">
+    <form method="POST" id="position_form">
+        {% csrf_token %}
+        capital:<input type="text" name="capital" id="capital" value="{% if capital %}{{capital}} {% endif %}" required><br>
+    Percentage of risk capital: <input type="text" name="per_risk_capital" id="per_risk_capital" value="{% if per_risk_capital %}{{per_risk_capital}} {% endif %}" required><br>
+       Buy Price: <input type="text" name="buy_price" id="buy_price" value="{% if buy_price %}{{buy_price}} {% endif %}" required><br>
+        Stop Loss:<input type="text" name="stop_loss" id="stop_loss" value="{% if stop_loss %}{{stop_loss}} {% endif %}"required><br>
+        <div id="error"></div>
+        <input type="submit" name="btn-sub" id="postion_cal"value="Calculate"> 
+
+    </form>
+    <div>
+        <p>Output:</p>
+        <p> {% if risk %}Risk: {{risk}} {% endif %}</p>
+        <p> {% if risk_percentage %}Risk Percentage {{risk_percentage}} {% endif %} </p>
+        <p>{% if risk %} Loss:{{risk}} {% endif %}</p>
+        <p>{% if position_size %}Shares: {{position_size}} {% endif %}</p>
+        <p> {%if cash  %}Position Size:{{cash}}{% endif %}</p>
+    </div>
+  
+</div>
+<script>
+    jQuery("#position_form").on("submit",function(){
+        var buy = jQuery("#buy_price").val();
+        var stop = jQuery("#stop_loss").val();
+        if(parseInt(stop) > parseInt(buy)){
+            jQuery("#error").html("<p>Buy Price should be greater than Stop Price</p>");
+            return false
+        }
+    });
+</script>
+{% endblock %}

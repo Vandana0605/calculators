@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Dasboard{% endblock %}
+{% block content %}
+<div class="wrapper">
+  <form method="POST" id="cal_form">
+    {% csrf_token %}
+    <div><label>Distance Travelled in Km</label><input type="text" id="vehicle_distance" value="{% if km %}{{km}}{% endif %}"name="km"><input type="radio" class="timeradio" name="dailyMonthly" value="daily" ><label>Daily</label> <input type="radio" name="dailyMonthly"  class="timeradio" value="monthly"><label>Monthly</label> <input type="radio" class="timeradio" name="dailyMonthly" value="yearly"><label>Yearly</label></div>
+<table class="table">
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">PETROL</th>
+        <th scope="col">DIESEL</th>
+        <th scope="col">CNG*</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">Kms / Litre
+          (Mileage of vehicle)	</th>
+        <td><input type="text" id="petrol_mileage" name="petrol_mileage" value="{% if petrol_mileage %}{{petrol_mileage}}{%else%}15{% endif %}"></td>
+        <td><input type="text" id="diesel_mileage" name="diesel_mileage" value="{% if diesel_mileage %}{{ diesel_mileage }}{%else%}20{% endif %}"></td>
+        <td><input type="text" id="cng_mileage" name="cng_mileage" value="{% if cng_mileage %}{{ cng_mileage }}{%else%}22{% endif %}"></td>
+      </tr>
+      <tr>
+        <th scope="row">Cost of Fuel</th>
+        <td><input type="text" id="petrol_price" value="{% if petrol_price %}{{petrol_price}}{%else%}96.20{% endif%}" name="petrol_price"></td>
+        <td><input type="text" id="diesel_price"  value="{% if diesel_price %}{{ diesel_price}}{%else%}84.26{% endif %}"name="diesel_price"></td>
+        <td><input type="text" id="cng_price"value="{% if cng_price %}{{ cng_price}}{%else%}79.56{% endif %}" name="cng_price"></td>
+      </tr>
+      <tr>
+        <th scope="row">Daily Fuel Cost</th>
+        <td>{% if daily_petrol_cost %}<span id="petrol_cost">{{daily_petrol_cost }}</span>{% endif %}</td>
+        <td>{% if daily_diesel_cost %}<span id="diesel_cost">{{ daily_diesel_cost}}</span>{% endif %}</td>
+        <td>{% if daily_cng_cost %}<span id="cng_cost">{{daily_cng_cost}}</span>{% endif %}</td>
+      </tr>
+      <tr>
+        <th scope="row">Monthly Fuel Cost</th>
+        <td>{% if monthly_petrol_cost %}{{ monthly_petrol_cost }}{% endif %}</td>
+        <td>{% if monthly_diesel_cost %}{{ monthly_diesel_cost}}{% endif %}</td>
+        <td>{% if monthly_cng_cost %}{{monthly_cng_cost}}{% endif %}</td>
+      </tr>
+      <tr>
+        <th scope="row">Yearly Fuel Cost</th>
+        <td>{% if Yearly_petrol_cost %}{{ Yearly_petrol_cost }}{% endif %}</td>
+        <td>{% if Yearly_diesel_cost %}{{ Yearly_diesel_cost}}{% endif %}</td>
+        <td>{% if Yearly_cng_cost %}{{ Yearly_cng_cost }}{% endif %}</td>
+      </tr>
+      
+    </tbody>
+  </table>
+  <input type="submit" name="btn-sub" value="Calculate">
+</form>
+{% if  Yearly_petrol_cost %}
+            <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+{% endif %}
+</div>
+<script>
+  jQuery(document).ready(function(){
+    var km = jQuery("#vehicle_distance").val();
+    if(km==''){
+      jQuery("#vehicle_distance").attr("value",70)
+      jQuery("#cal_form").submit()
+    }
+    var petrol_cost = jQuery("#petrol_cost").text();
+    var diesel_cost = jQuery("#diesel_cost").text();
+    var cng_cost = jQuery("#cng_cost").text();
+    var xValues = ["Pertrol", "Diesel", "CNG"];
+    var yValues = [petrol_cost, diesel_cost, cng_cost ];
+    var barColors = [
+      "#59D0B9",
+    "#5367ff",
+    "#98a4ff"
+    ];
+
+    new Chart("myChart", {
+    type: "doughnut",
+    data: {
+        labels: xValues,
+        datasets: [{
+        backgroundColor: barColors,
+        data: yValues
+        }]
+    },
+    options: {
+        title: {
+        display: true,
+        }
+    }
+    });
+    jQuery("#petrol_mileage").on("change",function(){
+      var petrol_mileage = jQuery(this).val();
+      jQuery("#petrol_mileage").attr("value",petrol_mileage);
+      jQuery("#cal_form").submit()
+    });
+    jQuery("#petrol_price").on("change",function(){
+      var petrol_price = jQuery(this).val();
+      jQuery("#petrol_price").attr("value", petrol_price);
+      jQuery("#cal_form").submit()
+    });
+    jQuery("#diesel_mileage").on("change",function(){
+      var diesel_mileage = jQuery(this).val();
+      jQuery("#diesel_mileage").attr("value", diesel_mileage);
+      jQuery("#cal_form").submit()
+    });
+    jQuery("#diesel_price").on("change",function(){
+      var diesel_price = jQuery(this).val();
+      jQuery("#diesel_price").attr("value", diesel_price);
+      jQuery("#cal_form").submit()
+    });
+    jQuery("#cng_mileage").on("change",function(){
+      var cng_mileage = jQuery(this).val();
+      jQuery("#cng_mileage").attr("value",cng_mileage);
+      jQuery("#cal_form").submit()
+    });
+    jQuery("#cng_price").on("change",function(){
+      var cng_price = jQuery(this).val();
+      jQuery("#cng_price").attr("value",cng_price);
+      jQuery("#cal_form").submit()
+    });
+
+    jQuery(".timeradio").on("change",function(){
+      var check_val = jQuery("input[name='dailyMonthly']:radio:checked").val();
+      if(check_val == 'daily'){
+      
+      jQuery("#vehicle_distance").attr("value",70);
+      jQuery("#cal_form").submit()
+      jQuery("input[name=dailyMonthly][value=" + check_val + "]").prop('checked', true);
+    }else if(check_val == 'monthly'){
+      
+      jQuery("#vehicle_distance").attr("value",2000);
+      jQuery("#cal_form").submit()
+    }else if (check_val == 'yearly'){
+      
+      jQuery("#vehicle_distance").attr("value",18000);
+      jQuery("#cal_form").submit()
+    }
+    });
+    
+    
+  });
+
+
+</script>
+{% endblock %}

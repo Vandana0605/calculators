@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Dasboard{% endblock %}
+{% block content %}
+<div>
+
+    <div class="card card-info">
+        <div class="card-header">
+        <h3 class="card-title">Horizontal Form</h3>
+        </div>
+        
+        
+        <form class="form-horizontal" id="calculate_form" method="POST">
+            {% csrf_token %}
+        <div class="card-body">
+        <div class="form-group row">
+        <label for="inputEmail3" class="col-sm-2 col-form-label">How much you can invest through monthly SIP? (Rs)</label>
+        <div class="col-sm-10">
+        <input type="range" id="investrange" name="vol" value="{% if monthly_amount %}{{monthly_amount}}{% endif %}" step="500" onchange="fetch_investment()" min="500" max="100000">
+        <input type="text" class="form-control" id="monthly_amount" name="monthly_amount" onchange="calculate()" value="{% if monthly_amount %}{{monthly_amount}}{% endif %}" placeholder="Ammount">
+        </div>
+        </div>
+        <div class="form-group row">
+        <label for="inputPassword3" class="col-sm-2 col-form-label">Rate</label>
+        <div class="col-sm-10">
+            <input type="range" id="raterange" name="vol" value="{% if rate %}{{rate}}{% endif %}" step="1" onchange="fetch_rate()" min="1" max="30">
+        <input type="text" class="form-control" id="rate" name="rate" onchange="calculate()" placeholder="Rate"value="{% if rate %}{{rate}}{% endif %}" >
+        </div>
+        </div>
+        <div class="form-group row">
+        <label for="inputPassword3" class="col-sm-2 col-form-label" >Year</label>
+        <div class="col-sm-10">
+            <input type="range" id="yearange" value="{% if years %}{{years}}{% endif %}" step="1" onchange="fetch_year()"  name="vol" min="1" max="30">
+        <input type="text" class="form-control" id="year" name="year" onchange="calculate()" placeholder="Years" value="{% if years %}{{years}}{% endif %}" >
+        </div>
+        </div>
+        <div class="form-group row">
+        <label for="monthlyincrease" class="col-sm-2 col-form-label" >How much annually increase
+            monthly SIP? (% per annum)</label>
+        <div class="col-sm-10">
+            <input type="range" id="increase_range" value="{% if annual_inc %}{{annual_inc}}{% endif %}" step="1" onchange="fetch_annual_increase()"  name="vol" min="1" max="30">
+        <input type="text" class="form-control" id="annual_increase" name="annual_increase" onchange="calculate()" placeholder="Annual Increase Ammount" value="{% if years %}{{years}}{% endif %}" >
+        </div>
+        </div>
+        </div>
+        <div class="card-footer">
+        <button type="submit" class="btn btn-info">Calculate</button>
+
+        </div>
+        
+        </form>
+        </div>
+        <div>{% if expected_amount %} Result: Expected Ammount :<span> {{ expected_amount }}</span> {% endif %}</div>
+        <div >{% if amount_invested %} Invested Ammount :<span id="amount_invested"> {{ amount_invested }} </span>{% endif %}</div>
+        <div >{% if wealth_gain %} Wealth Gain :<span id="wealth_gain"> {{ wealth_gain }}</span> {% endif %}</div>
+        {% if expected_amount %}
+            <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+        {% endif %}
+</div>
+<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<script>
+        jQuery(document).ready(function(){
+        
+        var invest = jQuery("#investrange").val();
+        var rate = jQuery("#raterange").val();
+        var year = jQuery("#yearange").val();
+        var annual_inc = jQuery("#increase_range").val();
+        if(invest =='' && rate=='' && year=='' && annual_inc==''){
+            jQuery("#monthly_amount").attr("value","1000");
+            jQuery("#rate").attr("value","4");
+            jQuery("#year").attr("value","2");
+            jQuery("#increase_range").attr("value","10");
+        }
+        jQuery("#monthly_amount").attr("value",invest);
+        jQuery("#rate").attr("value",rate);
+        jQuery("#year").attr("value",year);
+        jQuery("#annual_increase").attr("value",annual_inc);
+        jQuery("#calculate_form").on("change",function(){
+            jQuery("#calculate_form").submit();
+        });
+    
+    var investment = jQuery("#amount_invested").text();
+    var gainwealth = jQuery("#wealth_gain").text();
+    var xValues = ["Investment", "Gain Wealth"];
+    var yValues = [investment, gainwealth];
+    var barColors = [
+    "#5367ff",
+    "#98a4ff"
+    ];
+
+    new Chart("myChart", {
+    type: "doughnut",
+    data: {
+        labels: xValues,
+        datasets: [{
+        backgroundColor: barColors,
+        data: yValues
+        }]
+    },
+    options: {
+        title: {
+        display: true,
+        }
+    }
+    });
+
+});
+     function fetch_investment()
+    {
+        var get = document.getElementById("investrange").value;
+        document.getElementById("monthly_amount").value = get;
+    }
+    function fetch_rate()
+    {
+        var get = document.getElementById("raterange").value;
+        document.getElementById("rate").value = get;
+    }
+     function fetch_year()
+    {
+        var get = document.getElementById("yearange").value;
+        document.getElementById("year").value = get;
+    }
+    function fetch_annual_increase()
+    {
+        var get = document.getElementById("increase_range").value;
+        document.getElementById("annual_increase").value = get;
+    }
+    function calculate(){
+        document.getElementById("calculate_form").submit();
+    }
+    
+    
+
+</script>
+
+{% endblock content %}
